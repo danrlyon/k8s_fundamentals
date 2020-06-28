@@ -1,0 +1,54 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.services.ui.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Values.services.ui.label }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.ui.port }}
+    nodePort: {{ .Values.services.ui.nodePort }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.services.productApi.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.services.productApi.label }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.productApi.port }}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.services.orderApi.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.services.orderApi.label }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.orderApi.port }}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.mongo.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.mongo.label }}
+  ports:
+  - protocol: TCP
+    port: {{ .Values.mongo.port }}

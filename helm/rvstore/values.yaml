@@ -1,0 +1,61 @@
+# Spring properties
+springProfile: compose
+
+# Namespace
+namespace: rvstore
+
+# MongoDB properties
+mongo:
+  serviceName: rvstore-orders-mongodb
+  label: rvstore-mongo
+  image: mongo:4.2.5
+  replicas: 1
+  username: mongoadmin
+  password: secret
+  port: 27017
+
+# Service properties
+services:
+  targetCPUPercentage: 50
+  ui:
+    name: ui-deployment
+    serviceName: rvstore-ui
+    label: rvstore-ui
+    port: 80
+    nodePort: 30080
+    replicas: 1
+    image: vergeops/k8s-rvstore-ui:1.0
+    resources:
+      requests: 100m
+      limits: 200m
+  productApi:
+    name: product-api-deployment
+    serviceName: rvstore-product-api
+    label: rvstore-product-api
+    port: 9001
+    replicas: 1
+    image: vergeops/k8s-rvstore-product-api:1.0
+    resources:
+      requests: 100m
+      limits: 500m
+  orderApi:
+    name: order-api-deployment
+    serviceName: rvstore-order-api
+    label: rvstore-order-api
+    port: 9002
+    replicas: 1
+    image: vergeops/k8s-rvstore-order-api:1.0
+    resources:
+      requests: 100m
+      limits: 500m
+  orderSimulator:
+    name: order-simulator-deployment
+    replicas: 1
+    image: vergeops/k8s-rvstore-order-simulator:1.0
+    resources:
+      requests: 50m
+      limits: 100m
+    
+  ingress:
+    name: rvstore-gateway-ingress
+    port: 30880

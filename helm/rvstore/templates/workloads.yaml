@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.ui.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.services.ui.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.ui.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.ui.label }}
+    spec:
+      containers:
+      - name: ui
+        image: {{ .Values.services.ui.image }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{ .Values.services.ui.port }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.services.ui.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        resources:
+          limits:
+            cpu: {{ .Values.services.ui.resources.limits }}
+          requests:
+            cpu: {{ .Values.services.ui.resources.requests }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.productApi.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.services.productApi.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.productApi.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.productApi.label }}
+    spec:
+      containers:
+      - name: rvstore-product-api
+        image: {{ .Values.services.productApi.image }}
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-workload-config
+        ports:
+        - containerPort: {{ .Values.services.productApi.port }}
+        readinessProbe:
+          httpGet:
+            path: /products/
+            port: {{ .Values.services.productApi.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        resources:
+          limits:
+            cpu: {{ .Values.services.productApi.resources.limits }}
+          requests:
+            cpu: {{ .Values.services.productApi.resources.requests }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.orderApi.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.services.orderApi.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.orderApi.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.orderApi.label }}
+    spec:
+      containers:
+      - name: rvstore-order-api
+        image: {{ .Values.services.orderApi.image }}
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-workload-config
+        ports:
+        - containerPort: {{ .Values.services.orderApi.port }}
+        readinessProbe:
+          httpGet:
+            path: /orders
+            port: {{ .Values.services.orderApi.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 2
+          failureThreshold: 1
+        resources:
+          limits:
+            cpu: {{ .Values.services.orderApi.resources.limits }}
+          requests:
+            cpu: {{ .Values.services.orderApi.resources.requests }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.orderSimulator.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.services.orderSimulator.replicas }}
+  selector:
+    matchLabels:
+      app: order-simulator
+  template:
+    metadata:
+      labels:
+        app: order-simulator
+    spec:
+      containers:
+      - name: rvstore-order-simulator
+        image: {{ .Values.services.orderSimulator.image }}
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-workload-config
+        resources:
+          limits:
+            cpu: {{ .Values.services.orderSimulator.resources.limits }}
+          requests:
+            cpu: {{ .Values.services.orderSimulator.resources.requests }}
