@@ -140,8 +140,9 @@ Wait until `coredns` pod is in a `running` state
 kubectl get pods -n kube-system
 ```
 
-### Join nodes to cluster 
-Log into each of the worker nodes and run the join command from `kubeadm init` master output. 
+## Join nodes to cluster 
+Log into each worked and perform the Docker install and the Kubernetes install. Once completed,
+run the join command from `kubeadm init` master output. 
 ```
 sudo kubeadm join <command from kubeadm init output> --ignore-preflight-errors=all
 ```
