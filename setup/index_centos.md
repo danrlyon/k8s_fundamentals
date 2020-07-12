@@ -84,7 +84,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 exclude=kubelet kubeadm kubectl
 EOF
 ```
-# Set SELinux in permissive mode (effectively disabling it)
+## Set SELinux in permissive mode (effectively disabling it)
 ```
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
