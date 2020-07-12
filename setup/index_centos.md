@@ -86,14 +86,14 @@ EOF
 ```
 # Set SELinux in permissive mode (effectively disabling it)
 ```
-sudo setenforce 0
-sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 ```
 
 Now that you've added the repository install the packages
 ```
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-sudo systemctl enable --now kubelet
+yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+systemctl enable --now kubelet
 ```
 ***Note: kubectl does not need to be installed on worker nodes
 
