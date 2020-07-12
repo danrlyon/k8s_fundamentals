@@ -36,7 +36,7 @@ Following commands must be run as the root user. To become root run:
 ```
 sudo su - 
 ```
-## Install Docker Runtime 
+### Install Docker Runtime 
 NOTE: This will have to be done on all servers
 ```
 yum install -y yum-utils
@@ -59,7 +59,7 @@ To prove everything is working:
 docker run hello-world
 ```
 
-## Install packages required for Kubernetes on all servers as the root user
+### Install packages required for Kubernetes on all servers as the root user
 Letting iptables see bridged traffic
 ```
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -84,7 +84,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 exclude=kubelet kubeadm kubectl
 EOF
 ```
-## Set SELinux in permissive mode (effectively disabling it)
+### Set SELinux in permissive mode (effectively disabling it)
 ```
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
