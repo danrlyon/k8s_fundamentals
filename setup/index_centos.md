@@ -22,14 +22,16 @@ Expand “Connection/SSH/Auth and then specify the PPK file
 ![](index/FD3BA694-FD69-4C86-8EAF-4D5FC813EABA%208.png)
 
 ## Create Instances
-Use the Ubuntu Server 18.04 LTS AMI for your region
+Use the CentOS 7 (x86_64) - with Updates HVM AMI for your region
+T2.medium for size
 Use the default security group for all instances - make sure all ports are open for in/out traffic
 Both Instances should be part of the same subnet (in the same VPC)
+Add the EFS file system if created in class
 
-Create 2 instances: 1 master/1 worker - set their name label to your initials-master/your initials-worker1 (e.g jk-master/jk-worker1)
+Create 2 instances: 1 master/1 worker - set their name label to your initials-master/your userid-worker1 (e.g jkidd-master/jkidd-worker1)
 
 ## Install Kubernetes on all servers
-
+When opening an SSH connection use the centos user.
 Following commands must be run as the root user. To become root run: 
 ```
 sudo su - 
@@ -37,41 +39,61 @@ sudo su -
 ## Install Docker Runtime 
 NOTE: This will have to be done on all servers
 ```
-apt-get update
-apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+So that we can run Docker without being priviledged:
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+You will need to logout and back in....
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+To prove everything is working:
 ```
-```
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-```
-```
-apt-get update
-apt-get install -y  docker-ce docker-ce-cli containerd.io
+docker run hello-world
 ```
 
 ## Install packages required for Kubernetes on all servers as the root user
+Letting iptables see bridged traffic
 ```
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sudo sysctl --system
 ```
+
+Make sure the security group being used by the master and all worker nodes has all port open.
 
 Create Kubernetes repository by running the following as one command.
 ```
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+```
+# Set SELinux in permissive mode (effectively disabling it)
+```
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 ```
 
 Now that you've added the repository install the packages
 ```
-apt-get update
-apt-get install -y kubelet=1.17.0-00 kubeadm=1.17.0-00 kubectl
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo systemctl enable --now kubelet
 ```
 ***Note: kubectl does not need to be installed on worker nodes
 
