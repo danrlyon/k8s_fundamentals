@@ -39,18 +39,18 @@ sudo su -
 ## Install Docker Runtime 
 NOTE: This will have to be done on all servers
 ```
-sudo yum install -y yum-utils
-sudo yum-config-manager \
+yum install -y yum-utils
+yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install -y docker-ce docker-ce-cli containerd.io
-sudo systemctl start docker
-sudo systemctl enable docker
+yum install -y docker-ce docker-ce-cli containerd.io
+systemctl start docker
+systemctl enable docker
 ```
 So that we can run Docker without being priviledged:
 ```
-sudo groupadd docker
-sudo usermod -aG docker $USER
+groupadd docker
+usermod -aG docker $USER
 ```
 You will need to logout and back in....
 
